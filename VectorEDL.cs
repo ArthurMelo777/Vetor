@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 // DUVIDAS:
 // Posso dobrar a capacidade do Vector a cada vez que precisar
@@ -16,31 +16,121 @@ class IndexOutOfRangeException : Exception {
 }
 
 class Node {
-    private object ? element {get; set;}
-    private Node ? next {get; set; }
-    private Node ? prev {get; set;}
+    private object element = new object();
+    private Node next = new Node();
+    private Node prev = new Node();
+
+    public void setElement (object e) {
+        element = e;
+    }
+
+    public object getElement () {
+        return element;
+    }
+
+    public void setPrev (Node p) {
+        prev = p;
+    }
+
+    public Node getPrev () {
+        return prev;
+    }
+
+    public void setNext (Node n) {
+        next = n;
+    }
+
+    public Node getNext () {
+        return next;
+    }
 }
 
 class VectorLinkedList {
-    private Node ? first, last;
-    private int countSize;
+    private Node first = new Node(), last = new Node();
+    private int countSize = 0;
 
     public int size () {
-    }
-
-    public int capacity () {
+        return countSize;
     }
 
     public bool isEmpty () {
+        if (countSize == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public Node rank (int r) {
+        Node n;
+        if (r <= countSize/2) {
+            n = first;
+            for (int i = 0; i < r; i++) {
+                n = n.getNext();
+            }
+        }
+        else {
+            n = last;
+            for (int i = countSize; i > r; i--) {
+                n = n.getPrev();
+            }
+        }
+        
+        return n;
     }
 
     public object elemAtRank (int r) {
+        object o = rank(r).getElement();
+        return o;
     }
 
     public void insertAtRank (int r, object o) {
+        Node new_node = new Node();
+        new_node.setElement(o);
+        if (countSize == 0) {
+        }
+        else if ((r >= countSize) && (r != 0)) {
+            throw new IndexOutOfRangeException ();
+        }
+        else {
+            Node next = rank(r);
+            Node prev = next.getPrev();
+            new_node.setPrev(prev);
+            new_node.setNext(next);
+            prev.setNext(new_node);
+            next.setPrev(new_node);
+        }
+        
+        if (r == 0) {
+            first = new_node;
+        }
+        if (r == countSize-1) {
+            last = new_node;
+        }
+
+        countSize++;
     }
 
     public object removeAtRank (int r) {
+        if (isEmpty()) {
+            throw new VectorEmptyException ();
+        }
+
+        Node new_node = rank(r);
+        Node prev = new_node.getPrev();
+        Node next = new_node.getNext();
+        object o = new_node.getElement();
+        prev.setNext(next);
+        next.setPrev(prev);
+        
+        if (r == 0) {
+            first = next;
+        }
+        if (r == countSize-1) {
+            last = prev;
+        }
+
+        countSize--;
+        return o;
     }
 }
 
@@ -148,24 +238,19 @@ class VectorArray {
 
 class Program {
     public static void Main (string[] args) {
-        VectorArray vector = new VectorArray ();
-        vector.insertAtRank(0, '1');
+        VectorLinkedList vector = new VectorLinkedList();
+
+        vector.insertAtRank(0, 1);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
         vector.insertAtRank(1, 2);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
         vector.insertAtRank(2, 2);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
         vector.removeAtRank(1);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
         vector.removeAtRank(2);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
         vector.insertAtRank(0, 0);
         Console.WriteLine(vector.size());
-        Console.WriteLine(vector.capacity());
     }
 }
