@@ -16,9 +16,15 @@ class IndexOutOfRangeException : Exception {
 }
 
 class Node {
-    private object element = new object();
-    private Node next = new Node();
-    private Node prev = new Node();
+    private object element;
+    private Node next;
+    private Node prev;
+
+    public Node (object e, Node n, Node p) {
+        element = e;
+        next = n;
+        prev = p;
+    }
 
     public void setElement (object e) {
         element = e;
@@ -46,8 +52,13 @@ class Node {
 }
 
 class VectorLinkedList {
-    private Node first = new Node(), last = new Node();
+    private Node first, last;
     private int countSize = 0;
+
+    public VectorLinkedList (Node f, Node l) {
+        first = f;
+        last = l;
+    }
 
     public int size () {
         return countSize;
@@ -84,14 +95,11 @@ class VectorLinkedList {
     }
 
     public void insertAtRank (int r, object o) {
-        Node new_node = new Node();
-        new_node.setElement(o);
-        if (countSize == 0) {
-        }
-        else if ((r >= countSize) && (r != 0)) {
+        Node new_node = new Node(o, null, null);
+        if ((r >= countSize) && (r != 0)) {
             throw new IndexOutOfRangeException ();
         }
-        else {
+        if (!isEmpty()) {
             Node next = rank(r);
             Node prev = next.getPrev();
             new_node.setPrev(prev);
@@ -238,7 +246,7 @@ class VectorArray {
 
 class Program {
     public static void Main (string[] args) {
-        VectorLinkedList vector = new VectorLinkedList();
+        VectorLinkedList vector = new VectorLinkedList(null, null);
 
         vector.insertAtRank(0, 1);
         Console.WriteLine(vector.size());
