@@ -53,7 +53,7 @@ class Node {
 
 class VectorLinkedList {
     private Node first, last;
-    private int countSize = 0;
+    private int countSize = 0, n = 1;
 
     public VectorLinkedList (Node f, Node l) {
         first = f;
@@ -62,6 +62,10 @@ class VectorLinkedList {
 
     public int size () {
         return countSize;
+    }
+
+    public int capacity () {
+        return n;
     }
 
     public bool isEmpty () {
@@ -96,7 +100,7 @@ class VectorLinkedList {
 
     public void insertAtRank (int r, object o) {
         Node new_node = new Node(o, null, null);
-        if ((r >= countSize) && (r != 0)) {
+        if (r >= n) {
             throw new IndexOutOfRangeException ();
         }
         if (!isEmpty()) {
@@ -116,6 +120,7 @@ class VectorLinkedList {
         }
 
         countSize++;
+        n++;
     }
 
     public object removeAtRank (int r) {
@@ -138,6 +143,7 @@ class VectorLinkedList {
         }
 
         countSize--;
+        n--;
         return o;
     }
 }
