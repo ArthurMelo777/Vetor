@@ -1,13 +1,10 @@
 using System;
 
-// DUVIDAS:
-// Posso dobrar a capacidade do Vector a cada vez que precisar
-// de memoria ou terei que incrementar um a um?
-//
-// Caso possa dobrar, será necessário também realizar a decre-
-// mentar a cada remoção?
+class VectorEmpty : Exception {
 
-class VectorEmptyException : Exception {
+}
+
+class VectorIndexOutOfRange : Exception {
 
 }
 
@@ -49,7 +46,7 @@ class Node {
 
 class VectorLinkedList {
     private Node head, tail;
-    private int countSize = 0;
+    private int countSize = 0, cap = 1;
 
     public VectorLinkedList () {
         Node node = new Node(null, null, null);
@@ -61,6 +58,10 @@ class VectorLinkedList {
         return countSize;
     }
 
+    public int capacity () {
+        return cap;
+    }
+
     public bool isEmpty () {
         if (countSize == 0) {
             return true;
@@ -70,7 +71,7 @@ class VectorLinkedList {
 
     public Node rank (int r) {
         if (isEmpty()) {
-            throw new VectorEmptyException();
+            throw new VectorEmpty();
         }
 
         Node new_node = head.getNext();
@@ -83,7 +84,10 @@ class VectorLinkedList {
 
     public object elemAtRank (int r) {
         if (isEmpty()) {
-            throw new VectorEmptyException();
+            throw new VectorEmpty();
+        }
+        if (r > cap) {
+            throw new VectorIndexOutOfRange();
         }
         object o = rank(r).getElement();
         return o;
@@ -91,7 +95,10 @@ class VectorLinkedList {
 
     public object replaceAtRank (int r, object o) {
         if (isEmpty()) {
-            throw new VectorEmptyException();
+            throw new VectorEmpty();
+        }
+        if (r > cap) {
+            throw new VectorIndexOutOfRange();
         }
         Node new_node = rank(r);
         object t = new_node.getElement();
@@ -101,6 +108,9 @@ class VectorLinkedList {
 
     public void insertAtRank (int r, object o) {
         Node new_node;
+        if (r > cap) {
+            throw new VectorIndexOutOfRange();
+        }
         if (isEmpty()) {
             new_node = new Node(o, head, tail);
             head.setNext(new_node);
@@ -114,17 +124,21 @@ class VectorLinkedList {
         }
 
         countSize++;
+        cap++;
     }
 
     public object removeAtRank (int r) {
         if (isEmpty()) {
-            throw new VectorEmptyException ();
+            throw new VectorEmpty ();
         }
-
+        if (r > cap) {
+            throw new VectorIndexOutOfRange();
+        }
         Node new_node = rank(r);
         new_node.getPrev().setNext(new_node.getNext());
         new_node.getNext().setPrev(new_node.getPrev());
         countSize--;
+        cap--;
         return new_node.getElement();
     }
 
@@ -144,27 +158,27 @@ class VectorLinkedList {
 }
 
 class VectorArray {
-    private int countSize = 0, n = 1;
-    private object[] v = new object[1];
+    private int countSize = 0, cap = 1;
+    private object[] vector = new object[1];
 
     public void increment () {
-        object[] new_vector = new object[n++];
+        object[] new_vector = new object[cap++];
         
         for (int i = 0; i < countSize; i++) {
-            new_vector[i] = v[i];
+            new_vector[i] = vector[i];
         }
 
-        v = new_vector;
+        vector = new_vector;
     }
 
     public void decrement () {
-        object[] new_vector = new object[n--];
+        object[] new_vector = new object[cap--];
 
         for (int i = 0; i < countSize; i++) {
-            new_vector[i] = v[i];
+            new_vector[i] = vector[i];
         }
 
-        v = new_vector;
+        vector = new_vector;
     }
 
     public int size () {
@@ -172,7 +186,7 @@ class VectorArray {
     }
 
     public int capacity () {
-        return n;
+        return cap;
     }
 
     public bool isEmpty () {
@@ -184,72 +198,81 @@ class VectorArray {
 
     public object elemAtRank (int r) {
         if (isEmpty()) {
-            throw new VectorEmptyException ();
+            throw new VectorEmpty ();
         }
         if (r >= countSize) {
-            throw new IndexOutOfRangeException ();
+            throw new VectorIndexOutOfRange ();
         }
 
-        return v[r];
+        return vector[r];
     }
 
     public object replaceAtRank (int r, object o) {
         if (isEmpty()) {
-            throw new VectorEmptyException ();
+            throw new VectorEmpty ();
         }
         if (r >= countSize) {
-            throw new IndexOutOfRangeException ();
+            throw new VectorIndexOutOfRange ();
         }
 
-        object t = v[r];
-        v[r] = o;
+        object t = vector[r];
+        vector[r] = o;
         return t;
     }
 
     public void insertAtRank (int r, object o) {
-        if (r >= n) {
-            throw new IndexOutOfRangeException ();
+        if (r >= cap) {
+            throw new VectorIndexOutOfRange ();
         }
 
         increment();
 
-        object atual = v[r], proximo;
+        object current = vector[r], next;
 
         for (int i = r; i < countSize; i++) {
-            if (r+1 == n) {
+            if (i+1 == cap) {
                 break;
             }
-            
 
-            proximo = v[r];
-            v[r] = atual;
-            atual = proximo;
+            next = vector[r];
+            vector[r] = current;
+            current = next;
         }
-        
 
         countSize++;
     }
 
     public object removeAtRank (int r) {
         if (isEmpty()) {
-            throw new VectorEmptyException ();
+            throw new VectorEmpty ();
         }
 
         decrement();
 
-        object o = v[r];
+        object o = vector[r];
 
         countSize--;
 
         return o;
     }
+
+    public void printVector () {
+        if (isEmpty()) {
+            Console.Write("Vetor vazio coleguinha!");
+        }
+        for (int i = 0; i < countSize; i++) {
+            Console.Write($" [{vector[i]}]");
+        }
+        Console.WriteLine();
+    }
 }
 
 class Program {
     public static void Main (string[] args) {
-        VectorLinkedList vector = new VectorLinkedList();
+        VectorArray vector = new VectorArray();
         vector.printVector();
         Console.WriteLine(vector.size()); // 0
+        Console.WriteLine(vector.capacity()); // 1
         Console.WriteLine(vector.isEmpty()); // true
         vector.insertAtRank(0, 1); // inseriu
         vector.printVector(); // 1
@@ -259,6 +282,8 @@ class Program {
         Console.WriteLine(vector.replaceAtRank(0, 2)); // substituiu
         vector.printVector(); // 2 2
         Console.WriteLine(vector.removeAtRank(0)); // 2
+        Console.WriteLine(vector.size()); // 1
+        Console.WriteLine(vector.capacity()); // 1
         vector.printVector(); // 2
     }
 }
