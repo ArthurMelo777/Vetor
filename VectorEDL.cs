@@ -162,18 +162,9 @@ class VectorArray {
     private object[] vector = new object[1];
 
     public void increment () {
-        object[] new_vector = new object[cap++];
+        cap *= 2;
+        object[] new_vector = new object[cap];
         
-        for (int i = 0; i < countSize; i++) {
-            new_vector[i] = vector[i];
-        }
-
-        vector = new_vector;
-    }
-
-    public void decrement () {
-        object[] new_vector = new object[cap--];
-
         for (int i = 0; i < countSize; i++) {
             new_vector[i] = vector[i];
         }
@@ -224,13 +215,16 @@ class VectorArray {
         if (r >= cap) {
             throw new VectorIndexOutOfRange ();
         }
+        if (isEmpty()) {
+            vector[r] = o;
+        }
 
         increment();
 
         object current = vector[r], next;
 
         for (int i = r; i < countSize; i++) {
-            if (i+1 == cap) {
+            if (i+1 == countSize) {
                 break;
             }
 
@@ -247,9 +241,14 @@ class VectorArray {
             throw new VectorEmpty ();
         }
 
-        decrement();
-
         object o = vector[r];
+
+        for (int i = r; i < countSize; i++) {
+            if (i+1 >= countSize) {
+                break;
+            }
+            vector[i] = vector[i+1];
+        }
 
         countSize--;
 
